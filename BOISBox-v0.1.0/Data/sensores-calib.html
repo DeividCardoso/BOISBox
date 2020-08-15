@@ -55,7 +55,7 @@
                 <tbody>
                   <tr>
                     <th scope="row">Nível</th>
-                    <td>30 L</td>
+                    <td>30 %</td>
                     <td>
                       <button type="button" class="btn btn-sm btn-primary btn-block m-0">Calibrar</button>
                     </td>                    
@@ -93,6 +93,35 @@
           <div class="col-sm mb-5">
               <p class="font-weight-normal h5">Calibração</p>
               <hr>
+              <p class="font-weight-normal h5">Nível</p>
+              <p class="font-weight-normal text-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;É importante que a medida esteja estabilizada antes de salvar seu valor. Salve pelo menos o valor máximo e mínimo para cada sensor.</p>
+
+              <form action="postCalibNivel" method="POST">
+                
+                <table class="table">                 
+                  <thead></thead>
+                  <tbody>
+                    <td scope="row">                       
+                      <p>Medido: 30 %</p>
+                    </td>
+                    <td>
+                      <button class="btn btn-outline-secondary btn-sm" type="button">Atualizar medição</button>
+                    </td>
+                    <td>
+                      <div class="input-group input-group-sm mb-3">                          
+                        <input type="number" step="1" class="form-control" placeholder="Digite o valor real" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary" type="button">Salvar</button>
+                        </div>
+                      </div>
+                    </td>                 
+                  </tbody>
+                </table>
+
+              </form>
+
+
+
           </div>
 
         </div>
