@@ -4,15 +4,29 @@
 #include <DNSServer.h>
 #include <TimeLib.h>
 #include <ArduinoJson.h>
+#include <PubSubClient.h>
 
+// Mapeamento de Hardware ----------------------------
+//Nivel
+#define trig 5  
+#define echo 4  
+
+
+// Constantes MQTT -----------------------------------
+const char* mqtt_server = "ec2-18-207-3-216.compute-1.amazonaws.com"; //mqtt server
+char publishTopic[] = "sensores";
+char subscribeTopic[] = "atuadores";
+
+
+// Contantes Server ----------------------------------
 const byte        WEBSERVER_PORT          = 80;
-const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent"};
+const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
-const byte        LED_PIN                 = 2;
-const byte        LED_ON                  = HIGH;
-const byte        LED_OFF                 = LOW;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(8) + 250;
 
+
+WiFiClient espClient;
+PubSubClient client(espClient); //lib required for mqtt
 
 WebServer  server(WEBSERVER_PORT);
 DNSServer         dnsServer;
@@ -39,24 +53,6 @@ String softwareStr() {
   return String(__FILE__).substring(String(__FILE__).lastIndexOf("\\") + 1);
 }
 
-String longTimeStr(const time_t &t){
-  // Retorna segundos como "d:hh:mm:ss"
-  String s = String(t / SECS_PER_DAY) + ':';
-  if (hour(t) < 10) {
-    s += '0';
-  }
-  s += String(hour(t)) + ':';
-  if (minute(t) < 10) {
-    s += '0';
-  }
-  s += String(minute(t)) + ':';
-  if (second(t) < 10) {
-    s += '0';
-  }
-  s += String(second(t));
-  return s;
-}
-
 String hexStr(const unsigned long &h, const byte &l = 8) {
   // Retorna valor em formato hexadecimal
   String s;
@@ -66,28 +62,13 @@ String hexStr(const unsigned long &h, const byte &l = 8) {
   return s;
 }
 
-String deviceID() {
-  // Retorna ID padrão ESP32 utiliza função getEfuseMac()
-  return "IeC-" + hexStr(ESP.getEfuseMac());
-}
-
-String ipStr(const IPAddress &ip) {
-  // Retorna IPAddress em formato "n.n.n.n"
-  String sFn = "";
-  for (byte bFn = 0; bFn < 3; bFn++) {
-    sFn += String((ip >> (8 * bFn)) & 0xFF) + ".";
-  }
-  sFn += String(((ip >> 8 * 3)) & 0xFF);
-  return sFn;
-}
-
 // Funções de Configuração ------------------------------
 void  configReset() {
-  strlcpy(id, "BOIS Box", sizeof(id)); 
+  strlcpy(id, "Quality Box", sizeof(id)); 
   strlcpy(ssid, "", sizeof(ssid)); 
   strlcpy(pw, "", sizeof(pw)); 
   strlcpy(endpoint, "", sizeof(endpoint));
-  strlcpy(boxPw, "BOIS Box", sizeof(boxPw)); 
+  strlcpy(boxPw, "QBAdmin", sizeof(boxPw)); 
   timeout = 10;
   bootCount = 0;
   ledOn = false;
@@ -148,13 +129,105 @@ boolean configSave() {
 
     return true;
   }
-  Serial.println("Não abri");
   return false;
 }
 
 
+// MQTT --------------------------------------------
+void callbackMQTT(char* topic, byte* payload, unsigned int length) {   
+  Serial.print("Nova mensagem do broker: [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char)payload[i]);
+  }  
+  Serial.println();
+}
+
+void connectmqtt()
+{  
+  client.connect("Entrada");  // ESP will connect to mqtt broker with clientID - [Entrada/Saida]
+  {
+    if (!client.connected())
+    {
+      reconnect();
+    }
+    else{
+      log("Conectado");
+    }
+    
+    client.subscribe("status", 1);
+    client.subscribe("solenoide", 1);
+    client.subscribe("bomba", 1);
+    client.subscribe("motor", 1);
+    client.publish("status", "Conectado");    
+  }
+}
+
+void reconnect() {
+  byte b = 0;
+  while (!client.connected() && b < 5) {
+    Serial.println("Tentando reconectar ao Broker...");
+    if (client.connect("Entrada")) {
+      Serial.println("Conectado");
+      client.publish("Status", "Conectado");
+
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+    b++;
+  }
+}
 
 
+// Sensores ----------------------------------------
+bool leSensores(){
+  StaticJsonDocument<300> doc;
+  doc["id"] = 1;
+  doc["tipo"] = "Entrada";
+  JsonObject pH = doc.createNestedObject("ph");
+  pH["conectado"] = true;
+  pH["valor"] = leSensorPH();
+  JsonObject temp = doc.createNestedObject("temperatura");
+  temp["conectado"] = true;
+  temp["valor"] = leSensorTemperatura();
+  JsonObject vazao = doc.createNestedObject("vazao");
+  vazao["conectado"] = true;
+  vazao["valor"] = leSensorVazao();
+  JsonObject nivel = doc.createNestedObject("nivel");
+  nivel["conectado"] = true;
+  nivel["valor"] = leSensorNivel();
+  
+
+  // Generate the minified JSON and send it to the Serial port.
+  serializeJson(doc, Serial);
+  //Serial.println();
+
+  char buffer[256];
+  size_t n = serializeJson(doc, buffer);
+  return client.publish(publishTopic, buffer, n);
+}
+
+double leSensorPH(){
+  return (double) random(500, 700) / 100;
+}
+
+float leSensorNivel(){
+  return retornaNivel();
+}
+
+double leSensorVazao(){
+  return (double) random(0, 1000 / 100);
+}
+
+double leSensorTemperatura(){
+  return (double) random(1000, 3000) /100;
+}
 
 // Setup -------------------------------------------
 void setup() {
@@ -170,7 +243,6 @@ void setup() {
 
   configSave();
 
-  pinMode(LED_PIN, OUTPUT);
 
   // WiFi Access Point Configura WiFi para ESP32
   WiFi.setHostname(deviceID().c_str());
@@ -185,7 +257,7 @@ void setup() {
   WiFi.begin(ssid, pw);
   log("Conectando WiFi " + String(ssid));
   byte b = 0;
-  while(WiFi.status() != WL_CONNECTED && b < 60) {
+  while(WiFi.status() != WL_CONNECTED && b < 30) {
     b++;
     Serial.print(".");
     delay(500);
@@ -197,9 +269,11 @@ void setup() {
     log("WiFi conectado (" + String(WiFi.RSSI()) + ") IP " + ipStr(WiFi.localIP()));
   } else {
     log(F("WiFi não conectado"));
-  }
+  }  
+  
 
-  // Servindo as Paginas 
+  // Servindo as Paginas   
+  server.on(F("/"), handleLogin);
   server.on(F("/home"), handleHome);
   server.on(F("/config"), handleConfiguration);
   server.on(F("/sensores"), handleSensores);
@@ -216,11 +290,23 @@ void setup() {
   server.on(F("/postNetSave"), handleNetSave);    
   server.on(F("/reboot"), handleReboot);
   server.on(F("/postBoxSave"), handleBoxPw);
+  server.on(F("/loginCheck"), HTTP_POST, handleLoginCheck);
 
-  server.onNotFound(handleHome);
+  server.onNotFound(handleLogin);
   server.collectHeaders(WEBSERVER_HEADER_KEYS, 1);
   server.begin();
 
+  
+  //MQTT
+  client.setServer(mqtt_server, 1883);//connecting to mqtt server
+  client.setCallback(callbackMQTT);
+  //delay(5000);
+
+  if(WiFi.status() == WL_CONNECTED){
+    connectmqtt();
+  }  
+  
+  configuraUltrassonico();
   // Pronto
   log(F("Pronto"));
 }
@@ -234,5 +320,24 @@ void loop() {
   dnsServer.processNextRequest();
 
   // Web ---------------------------------------------
-  server.handleClient();
+  server.handleClient();  
+
+  if (!client.connected())
+  {
+    if(WiFi.status() == WL_CONNECTED){
+      reconnect();      
+    }
+  } 
+  else{
+  // Negocio --------------------------
+    log("Lendo os sensores e publicando no topico...");
+    if(leSensores()){
+      log("Publicado com sucesso!");
+    }
+    else{
+      log("Falhou a publicação");
+    }
+    //delay(2000);
+  }  
+  client.loop();
 }

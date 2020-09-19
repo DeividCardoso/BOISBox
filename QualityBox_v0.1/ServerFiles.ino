@@ -5,7 +5,6 @@ void handleLogin() {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
-
     server.send(200, F("text/html"), s);
     log("Login - Cliente: " + ipStr(server.client().remoteIP()) +
         (server.uri() != "/" ? " [" + server.uri() + "]" : ""));
@@ -13,6 +12,31 @@ void handleLogin() {
     server.send(500, F("text/plain"), F("Login - ERROR 500"));
     log(F("Login - ERRO lendo arquivo"));
   }
+}
+
+void handleLoginCheck() {    
+    if(server.hasArg("user") && server.hasArg("pw")){     
+      String user = server.arg("user");
+      String pw = server.arg("pw");
+      user.trim();
+      pw.trim();
+      
+      if(user != "Admin" || pw != boxPw){
+        log("Usuário ou senha inválidos!");
+        log(user);
+        log(pw);
+        server.sendHeader("Location", "/",true); //Redirect to our html web page 
+        server.send(302, "text/plane",""); 
+      }  
+      else{            
+        server.sendHeader("Location", "/home",true); //Redirect to our html web page 
+        server.send(302, "text/plane",""); 
+      }      
+    }
+    else{
+      server.sendHeader("Location", "/",true);
+      server.send(302, "text/plane",""); 
+    }
 }
 
 void handleHome() {

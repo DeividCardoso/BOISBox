@@ -8,13 +8,13 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap">
 
-    <title>BOIS Box</title>
+    <title>Quality Box</title>
   </head>
   <body>
     
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
         <div class="container">
-            <a class="navbar-brand" href="home">BOIS Box</a>
+            <a class="navbar-brand" href="home">Quality Box</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -25,10 +25,10 @@
                     <a class="nav-link" href="config">Configurações</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="sensores">Sensores</a>
+                    <a class="nav-link" href="sensores">Sensores</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="atuadores">Atuadores</a>
+                    <a class="nav-link active" href="atuadores">Atuadores</a>
                 </li>
             </ul>
             <div>
@@ -47,41 +47,37 @@
         <div class="row">
           
           <div class="col-sm mb-5">                  
-              <p class="font-weight-normal h5">Sensores</p>  
+              <p class="font-weight-normal h5">Atuadores</p>  
               <hr>  
               
               <table class="table table-striped table-responsive-md">
                 <thead></thead>                
                 <tbody>
                   <tr>
-                    <th scope="row">Nível</th>
-                    <td>30 %</td>
+                    <th scope="row">Bomba</th>
                     <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Calibrar</button>
+                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
                     </td>                    
                     <td><button type="button" class="btn btn-sm btn-danger btn-block m-0">Desconectar</button></td>
                   </tr>
                   <tr>
-                    <th scope="row">Temperatura</th>
-                    <td>23.3 ºC</td>
+                    <th scope="row">Clorador</th>
                     <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Calibrar</button>
+                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
                     </td>                    
                     <td><button type="button" class="btn btn-sm btn-danger btn-block m-0">Desconectar</button></td>
                   </tr>
                   <tr>
-                    <th scope="row">pH</th>
-                    <td>- -</td>
+                    <th scope="row">Solenoide 1</th>
                     <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Calibrar</button>
+                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
                     </td>                    
                     <td><button type="button" class="btn btn-sm btn-success btn-block m-0">Conectar</button></td>
                   </tr>
                   <tr>
-                    <th scope="row">Vazão</th>
-                    <td>- -</td>
+                    <th scope="row">Solenoide 2</th>
                     <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Calibrar</button>
+                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
                     </td>                    
                     <td><button type="button" class="btn btn-sm btn-success btn-block m-0">Conectar</button></td>
                   </tr>
@@ -91,37 +87,9 @@
           </div>
 
           <div class="col-sm mb-5">
-              <p class="font-weight-normal h5">Calibração</p>
+              <p class="font-weight-normal h5">Teste</p>
               <hr>
-              <p class="font-weight-normal h5">Nível</p>
-              <p class="font-weight-normal text-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;É importante que a medida esteja estabilizada antes de salvar seu valor. Salve pelo menos o valor máximo e mínimo para cada sensor.</p>
-
-              <form action="postCalibNivel" method="POST">
-                
-                <table class="table">                 
-                  <thead></thead>
-                  <tbody>
-                    <td scope="row">                       
-                      <p>Medido: 30 %</p>
-                    </td>
-                    <td>
-                      <button class="btn btn-outline-secondary btn-sm" type="button">Atualizar medição</button>
-                    </td>
-                    <td>
-                      <div class="input-group input-group-sm mb-3">                          
-                        <input type="number" step="1" class="form-control" placeholder="Digite o valor real" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                          <button class="btn btn-outline-secondary" type="button">Salvar</button>
-                        </div>
-                      </div>
-                    </td>                 
-                  </tbody>
-                </table>
-
-              </form>
-
-
-
+              
           </div>
 
         </div>
