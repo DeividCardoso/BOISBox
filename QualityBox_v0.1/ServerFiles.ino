@@ -63,18 +63,19 @@ void handleHome() {
   }
 }
 
-void handleConfiguration() {
-
-  Serial.println("Entrei no configuration");
+void handleConfiguration() {  
   File file = SPIFFS.open(F("/configuration.html"), "r");
   if (file) {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
     s.replace(F("#ssid#"), ssid);
-    s.replace(F("#endpoint#"), endpoint);
+    s.replace(F("#broker#"), broker);
     s.replace(F("#timeout#"), String(timeout));
     
+    if(bkrOn){
+      s.replace(F("#brokerchecked#"), "checked");
+    }
 
     if (WiFi.status() != WL_CONNECTED) {
       s.replace(F("#displayConnected#"), "d-none");     
@@ -106,12 +107,24 @@ void handleNetSave(){
       }
     }    
     
-    if(server.hasArg("endpoint")){
-      s = server.arg("endpoint");
+    if(server.hasArg("broker")){
+      s = server.arg("broker");
       s.trim();
-      strlcpy(endpoint, s.c_str(), sizeof(endpoint));
+      strlcpy(broker, s.c_str(), sizeof(broker));
+      log("Broker: ");
+      log(s);
     }
+    bkrOn = false;
     
+    if(server.hasArg("brokerCheck")){
+      s = server.arg("brokerCheck");
+      s.trim();
+      if(s == "on")
+      {
+        bkrOn = true;
+      }
+    }
+
     if(server.hasArg("timeout")){
       s = server.arg("timeout");
       timeout = s.toInt();
@@ -177,6 +190,40 @@ void handleSensores() {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
+
+    if(nivelOn){
+       s.replace(F("#btn-nivel-cor#"), "btn-danger");
+       s.replace(F("#text-nivel#"), "Desconectar");
+    }
+    else {
+       s.replace(F("#btn-nivel-cor#"), "btn-primary");
+       s.replace(F("#text-nivel#"), "Conectar");
+    }
+
+    if(phOn){
+       s.replace(F("#btn-ph-cor#"), "btn-danger");
+       s.replace(F("#text-ph#"), "Desconectar");
+    }
+    else {
+       s.replace(F("#btn-ph-cor#"), "btn-primary");
+       s.replace(F("#text-ph#"), "Conectar");
+    }
+     if(temperaturaOn){
+       s.replace(F("#btn-temperatura-cor#"), "btn-danger");
+       s.replace(F("#text-temperatura#"), "Desconectar");
+    }
+    else {
+       s.replace(F("#btn-temperatura-cor#"), "btn-primary");
+       s.replace(F("#text-temperatura#"), "Conectar");
+    }
+     if(vazaoOn){
+       s.replace(F("#btn-vazao-cor#"), "btn-danger");
+       s.replace(F("#text-vazao#"), "Desconectar");
+    }
+    else {
+       s.replace(F("#btn-vazao-cor#"), "btn-primary");
+       s.replace(F("#text-vazao#"), "Conectar");
+    }
 
     server.send(200, F("text/html"), s);
     log("Sensores - Cliente: " + ipStr(server.client().remoteIP()) +

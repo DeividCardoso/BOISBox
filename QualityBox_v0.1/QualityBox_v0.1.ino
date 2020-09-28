@@ -22,7 +22,7 @@ char subscribeTopic[] = "atuadores";
 const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
-const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(8) + 250;
+const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(12) + 290;
 
 
 WiFiClient espClient;
@@ -35,11 +35,15 @@ DNSServer         dnsServer;
 char              id[30];       // Identificação do dispositivo
 char              ssid[30];     // Rede WiFi
 char              pw[30];       // Senha da Rede WiFi
-char              endpoint[60]; 
+char              broker[60]; 
 char              boxPw[20];
 word              timeout;
 word              bootCount;    // Número de inicializações
-boolean           ledOn;        // Estado do LED
+boolean           bkrOn;        
+boolean           phOn;
+boolean           vazaoOn;
+boolean           nivelOn;
+boolean           temperaturaOn;
 
 
 // Funções Genéricas ------------------------------------
@@ -67,11 +71,15 @@ void  configReset() {
   strlcpy(id, "Quality Box", sizeof(id)); 
   strlcpy(ssid, "", sizeof(ssid)); 
   strlcpy(pw, "", sizeof(pw)); 
-  strlcpy(endpoint, "", sizeof(endpoint));
-  strlcpy(boxPw, "QBAdmin", sizeof(boxPw)); 
+  strlcpy(broker, mqtt_server, sizeof(broker));
+  strlcpy(boxPw, "12345", sizeof(boxPw)); 
   timeout = 10;
   bootCount = 0;
-  ledOn = false;
+  bkrOn = false;
+  phOn = false;
+  nivelOn = false;
+  vazaoOn = false;
+  temperaturaOn = false;
 }
 
 boolean configRead() {
@@ -88,12 +96,15 @@ boolean configRead() {
     strlcpy(id, jsonConfig["id"] | "", sizeof(id)); 
     strlcpy(ssid, jsonConfig["ssid"] | "", sizeof(ssid)); 
     strlcpy(pw, jsonConfig["pw"] | "", sizeof(pw)); 
-    strlcpy(endpoint, jsonConfig["endpoint"] | "", sizeof(endpoint)); 
+    strlcpy(broker, jsonConfig["broker"] | "", sizeof(broker)); 
     strlcpy(boxPw, jsonConfig["boxPw"] | "", sizeof(boxPw)); 
     timeout = jsonConfig["timeout"] | 0;
     bootCount = jsonConfig["boot"]    | 0;
-    ledOn     = jsonConfig["led"]     | false;
-
+    bkrOn     = jsonConfig["bkr"]     | false;
+    phOn     = jsonConfig["ph"]     | false;
+    nivelOn     = jsonConfig["nivel"]     | false;
+    vazaoOn     = jsonConfig["vazao"]     | false;
+    temperaturaOn     = jsonConfig["temperatura"]     | false;
 
     file.close();
 
@@ -114,11 +125,15 @@ boolean configSave() {
     jsonConfig["id"]        = id;
     jsonConfig["ssid"]      = ssid;
     jsonConfig["pw"]        = pw;
-    jsonConfig["endpoint"]  = endpoint;
+    jsonConfig["broker"]  = broker;
     jsonConfig["boxPw"]     = boxPw;
     jsonConfig["timeout"]   = timeout;
     jsonConfig["boot"]      = bootCount;
-    jsonConfig["led"]       = ledOn;
+    jsonConfig["bkr"]       = bkrOn;
+    jsonConfig["ph"]       = phOn;
+    jsonConfig["nivel"]       = nivelOn;
+    jsonConfig["vazao"]       = vazaoOn;
+    jsonConfig["temperatura"]       = temperaturaOn;
 
     serializeJsonPretty(jsonConfig, file);
     file.close();
@@ -154,7 +169,7 @@ void connectmqtt()
       reconnect();
     }
     else{
-      log("Conectado");
+      log("Broker Conectado");
     }
     
     client.subscribe("status", 1);
@@ -170,7 +185,7 @@ void reconnect() {
   while (!client.connected() && b < 5) {
     Serial.println("Tentando reconectar ao Broker...");
     if (client.connect("Entrada")) {
-      Serial.println("Conectado");
+      Serial.println(" Broker Conectado");
       client.publish("Status", "Conectado");
 
     } else {
@@ -279,6 +294,7 @@ void setup() {
   server.on(F("/sensores"), handleSensores);
   server.on(F("/atuadores")  , handleAtuadores);
   server.on(F("/json")  , handleJsonPage);
+  server.on(F("/reconfig")  , handleReconfig);
 
   // Recursos CSS e JS
   server.on(F("/bootstrap"), handleBootstrap);
@@ -298,7 +314,7 @@ void setup() {
 
   
   //MQTT
-  client.setServer(mqtt_server, 1883);//connecting to mqtt server
+  client.setServer(broker, 1883);//connecting to mqtt server
   client.setCallback(callbackMQTT);
   //delay(5000);
 
@@ -308,6 +324,9 @@ void setup() {
   
   configuraUltrassonico();
   // Pronto
+  if(!bkrOn){
+    log("Notificações desabilitadas!");
+  }
   log(F("Pronto"));
 }
 
@@ -330,14 +349,15 @@ void loop() {
   } 
   else{
   // Negocio --------------------------
-    log("Lendo os sensores e publicando no topico...");
-    if(leSensores()){
-      log("Publicado com sucesso!");
+    if(bkrOn){
+      if(leSensores()){
+        log("\nPublicado com sucesso!");
+      }
+      else{
+        log("\nFalhou a publicação");
+      }
+      //delay(2000);
     }
-    else{
-      log("Falhou a publicação");
-    }
-    //delay(2000);
   }  
   client.loop();
 }

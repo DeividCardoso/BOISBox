@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
+
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,114 +10,134 @@
     <link rel="stylesheet" href="bootstrap">
 
     <title>Quality Box</title>
-  </head>
-  <body>
-    
+</head>
+
+<body>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
         <div class="container">
             <a class="navbar-brand" href="home">Quality Box</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-        
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto px-5">
-                <li class="nav-item">
-                    <a class="nav-link active" href="config">Configurações</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="sensores">Sensores</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="atuadores">Atuadores</a>
-                </li>
-            </ul>
-            <div>
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav mr-auto px-5">
                     <li class="nav-item">
-                    <a class="nav-link" href="logout">Sair</a>
+                        <a class="nav-link active" href="config">Configurações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sensores">Sensores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="atuadores">Atuadores</a>
                     </li>
                 </ul>
-            </div>
+                <div>
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout">Sair</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-      </nav>
+    </nav>
 
-      <div class="container">
+    <div class="container">
         <div class="row">
-            <div class="col-sm mb-5">                  
-                <p class="font-weight-normal h5">Configurações de rede</p>  
-                <hr>                 
-                <form class="py-4" name="config" action="postNetSave" method="post">                                                
-                        <div class="container pb-3">
+            <div class="col-sm mb-5">
+                <p class="font-weight-normal h5">Configurações de rede</p>
+                <hr>
+                <form class="py-4" name="config" action="postNetSave" method="post">
+                    <div class="container pb-3">
 
-                            <div class="form-group row  #displayConnected#">
-                                <span>Conectado em: #ssid#</span>
-                            </div>
+                        <div class="form-group row  #displayConnected#">
+                            <span>Conectado em: #ssid#</span>
+                        </div>
 
-                            <div class="form-group row">
-                                <label for="ssid" class="col-sm-2 col-form-label">SSID</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="ssid" name="ssid" value="#ssid#"  placeholder="Nome da rede Wi-fi" required="Informe a rede Wifi">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="pw" class="col-sm-2 col-form-label">Senha</label>
-                                <div class="col-sm-10">
-                                    <input type="password" class="form-control" id="pw" name="pw" placeholder="Senha">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="endpoint" class="col-sm-2 col-form-label">API</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="endpoint" name="endpoint" value="#endpoint#" placeholder="Endpoint da API para teste">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="timeout" class="col-sm-8 col-form-label">Timeout de atualização dos dados (segundos)</label>
-                                <div class="col-sm-4">
-                                    <input type="number" class="form-control" id="timeout" name="timeout" value="#timeout#" required="Informe o intervalo de atualização dos dados">
-                                </div>
+                        <div class="form-group row">
+                            <label for="ssid" class="col-sm-2 col-form-label">SSID</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="ssid" name="ssid" value="#ssid#"
+                                    placeholder="Nome da rede Wi-fi" required="Informe a rede Wifi">
                             </div>
                         </div>
-                        <div class="col-lg-12" style="text-align: right;">
-                            <p class=""><small>Para conectar no Wifi é necessário reiniciar o módulo depois de gravar as configurações.</small></p>
-                            <a href="reboot" class="btn btn-danger">Reiniciar módulo</a>
-                            <button type="submit" class="btn btn-primary">Gravar</button>
+
+                        <div class="form-group row">
+                            <label for="pw" class="col-sm-2 col-form-label">Senha</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="pw" name="pw" placeholder="Senha">
+                            </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label for="broker" class="col-sm-2 col-form-label">Broker</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="broker" name="broker" value="#broker#"
+                                    placeholder="Endereço do Broker">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="timeout" class="col-sm-8 col-form-label">Timeout de atualização dos dados
+                                (segundos)</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="timeout" name="timeout" value="#timeout#"
+                                    required="Informe o intervalo de atualização dos dados">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12" style="text-align: right;">
+                        <p class="">
+                            <small>
+                                <div>
+                                    <label for="brokerCheck">Ativar notificações do Broker</label>
+                                    <input type="checkbox" id="brokerCheck" name="brokerCheck" #brokerchecked#>
+                                </div>
+                            </small></p>
+                        <p class=""><small>Para conectar no Wifi é necessário reiniciar o módulo depois de gravar as
+                                configurações.</small></p>
+                        <a href="reconfig" class="btn btn-dark">Padrão de fábrica</a>
+                        <a href="reboot" class="btn btn-danger">Reiniciar módulo</a>
+                        <button type="submit" class="btn btn-primary">Gravar</button>
+                    </div>
                 </form>
             </div>
             <div class="col-sm mb-5">
-                <p class="font-weight-normal h5">Trocar senha do box</p>   
-                <hr> 
-                <form class="py-4" name="config" action="postBoxSave" method="post">                                                
-                        <div class="container pb-2">
-                            <div class="form-group row">
-                                <label for="oldPassword" class="col-sm-3 col-form-label">Senha Antiga</label>
-                                <div class="col-sm-9">
-                                    <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Senha antiga do Box">
-                                </div>
-                            </div>                            
-                            <div class="form-group row">
-                                <label for="newPassword" class="col-sm-3 col-form-label">Nova Senha</label>
-                                <div class="col-sm-9">
-                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nova Senha">
-                                </div>
-                            </div>
-                                                       
-                            <div class="form-group row">
-                                <label for="reNewPassword" class="col-sm-3 col-form-label">Repita Senha</label>
-                                <div class="col-sm-9">
-                                    <input type="password" class="form-control" id="reNewPassword" name="reNewPassword" placeholder="Repita a nova Senha">
-                                </div>
+                <p class="font-weight-normal h5">Trocar senha do box</p>
+                <hr>
+                <form class="py-4" name="config" action="postBoxSave" method="post">
+                    <div class="container pb-2">
+                        <div class="form-group row">
+                            <label for="oldPassword" class="col-sm-3 col-form-label">Senha Antiga</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="oldPassword" name="oldPassword"
+                                    placeholder="Senha antiga do Box">
                             </div>
                         </div>
-                        <div class="col-lg-12" style="text-align: right;">
-                            <button type="submit" class="btn btn-primary">Gravar</button>
+                        <div class="form-group row">
+                            <label for="newPassword" class="col-sm-3 col-form-label">Nova Senha</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="newPassword" name="newPassword"
+                                    placeholder="Nova Senha">
+                            </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label for="reNewPassword" class="col-sm-3 col-form-label">Repita Senha</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="reNewPassword" name="reNewPassword"
+                                    placeholder="Repita a nova Senha">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="text-align: right;">
+                        <button type="submit" class="btn btn-primary">Gravar</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -126,5 +147,6 @@
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="jquery"></script>
     <script src="bootstrap-js"></script>
-  </body>
+</body>
+
 </html>
