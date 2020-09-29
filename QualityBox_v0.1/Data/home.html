@@ -1,97 +1,76 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="bootstrap">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Quality Box</title>
-  </head>
-  <body>
-    
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
-        <div class="container">
-            <a class="navbar-brand" href="home">Quality Box</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto px-5">
-                <li class="nav-item">
-                    <a class="nav-link" href="config">Configurações</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="sensores">Sensores</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="atuadores">Atuadores</a>
-                </li>
-            </ul>
-            <div>
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                    <a class="nav-link" href="logout">Sair</a>
-                    </li>
-                </ul>
-            </div>
-            </div>
-        </div>
-      </nav>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="bootstrap">
 
-      <div class="container">
-        <div class="row">
-            <div class="col-sm"> 
-                <p class="font-weight-normal h5">Informações do Box</p>  
-                
-                <table class="table mt-5">
-                    <tbody>
-                      <tr>
-                        <th scope="row">Identificação</th>
-                        <td>#id#</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Inicializações</th>
-                        <td>#bootCount#</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Serial</th>
-                        <td>#serial#</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Software</th>
-                        <td>#software#</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">IP Interno</th>
-                        <td>#sysIP#</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">IP Cliente</th>
-                        <td>#clientIP#</td>
-                      </tr>                      
-                      <tr>
-                        <th scope="row">Tempo Ativo</th>
-                        <td>#active#</td>
-                      </tr>                                         
-                      <tr>
-                        <th scope="row">Navegador</th>
-                        <td>#userAgent#</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  
-            </div>
-            <div class="col-sm"> </div>
-        </div>
+  <title>Quality Box</title>
+</head>
+
+<body>
+
+  <navMenu></navMenu>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <p class="font-weight-normal h5">Informações do Box</p>
+
+        <table class="table mt-5">
+          <tbody>
+            <tr>
+              <th scope="row">Id</th>
+              <td>#id#</td>
+            </tr>
+            <tr>
+              <th scope="row">Tipo</th>
+              <td>#tipo#</td>
+            </tr>
+            <tr>
+              <th scope="row">Boots</th>
+              <td>#bootCount#</td>
+            </tr>
+            <tr>
+              <th scope="row">Serial</th>
+              <td>#serial#</td>
+            </tr>
+            <tr>
+              <th scope="row">Software</th>
+              <td>#software#</td>
+            </tr>
+            <tr>
+              <th scope="row">IP Box</th>
+              <td>#sysIP#</td>
+            </tr>
+            <tr>
+              <th scope="row">IP Cliente</th>
+              <td>#clientIP#</td>
+            </tr>
+            <tr>
+              <th scope="row">Tempo Ativo</th>
+              <td>#active#</td>
+            </tr>
+            <tr>
+              <th scope="row">Navegador</th>
+              <td>#userAgent#</td>
+            </tr>
+          </tbody>
+        </table>
+
       </div>
+      <div class="col-sm"> </div>
+    </div>
+  </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="jquery"></script>
-    <script src="bootstrap-js"></script>
-  </body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="jquery"></script>
+  <script src="bootstrap-js"></script>
+</body>
+
 </html>

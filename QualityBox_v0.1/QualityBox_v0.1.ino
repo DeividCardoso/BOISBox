@@ -22,7 +22,7 @@ char subscribeTopic[] = "atuadores";
 const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
-const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(12) + 290;
+const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
 
 
 WiFiClient espClient;
@@ -33,6 +33,7 @@ DNSServer         dnsServer;
 
 // Variáveis Globais ------------------------------------
 char              id[30];       // Identificação do dispositivo
+char              tipo[30]; 
 char              ssid[30];     // Rede WiFi
 char              pw[30];       // Senha da Rede WiFi
 char              broker[60]; 
@@ -68,7 +69,8 @@ String hexStr(const unsigned long &h, const byte &l = 8) {
 
 // Funções de Configuração ------------------------------
 void  configReset() {
-  strlcpy(id, "Quality Box", sizeof(id)); 
+  strlcpy(id, "1", sizeof(id)); 
+  strlcpy(tipo, "Entrada", sizeof(tipo)); 
   strlcpy(ssid, "", sizeof(ssid)); 
   strlcpy(pw, "", sizeof(pw)); 
   strlcpy(broker, mqtt_server, sizeof(broker));
@@ -94,6 +96,7 @@ boolean configRead() {
     return false;
   } else {
     strlcpy(id, jsonConfig["id"] | "", sizeof(id)); 
+    strlcpy(tipo, jsonConfig["tipo"] | "", sizeof(tipo)); 
     strlcpy(ssid, jsonConfig["ssid"] | "", sizeof(ssid)); 
     strlcpy(pw, jsonConfig["pw"] | "", sizeof(pw)); 
     strlcpy(broker, jsonConfig["broker"] | "", sizeof(broker)); 
@@ -123,6 +126,7 @@ boolean configSave() {
   if (file) {
     // Atribui valores ao JSON e grava
     jsonConfig["id"]        = id;
+    jsonConfig["tipo"]        = tipo;
     jsonConfig["ssid"]      = ssid;
     jsonConfig["pw"]        = pw;
     jsonConfig["broker"]  = broker;
@@ -184,7 +188,7 @@ void reconnect() {
   byte b = 0;
   while (!client.connected() && b < 5) {
     Serial.println("Tentando reconectar ao Broker...");
-    if (client.connect("Entrada")) {
+    if (client.connect(tipo)) {
       Serial.println(" Broker Conectado");
       client.publish("Status", "Conectado");
 
@@ -203,19 +207,19 @@ void reconnect() {
 // Sensores ----------------------------------------
 bool leSensores(){
   StaticJsonDocument<300> doc;
-  doc["id"] = 1;
-  doc["tipo"] = "Entrada";
+  doc["id"] = id;
+  doc["tipo"] = tipo;
   JsonObject pH = doc.createNestedObject("ph");
-  pH["conectado"] = true;
+  pH["conectado"] = phOn;
   pH["valor"] = leSensorPH();
   JsonObject temp = doc.createNestedObject("temperatura");
-  temp["conectado"] = true;
+  temp["conectado"] = temperaturaOn;
   temp["valor"] = leSensorTemperatura();
   JsonObject vazao = doc.createNestedObject("vazao");
-  vazao["conectado"] = true;
+  vazao["conectado"] = vazaoOn;
   vazao["valor"] = leSensorVazao();
   JsonObject nivel = doc.createNestedObject("nivel");
-  nivel["conectado"] = true;
+  nivel["conectado"] = nivelOn;
   nivel["valor"] = leSensorNivel();
   
 

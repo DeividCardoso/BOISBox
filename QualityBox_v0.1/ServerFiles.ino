@@ -45,7 +45,17 @@ void handleHome() {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
+    
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+    }  
+    
     s.replace(F("#id#"), id);
+    s.replace(F("#tipo#"), tipo);
     s.replace(F("#bootCount#"), String(bootCount));
     s.replace(F("#serial#") , hexStr(ESP.getEfuseMac()));
     s.replace(F("#software#") , softwareStr());
@@ -69,6 +79,18 @@ void handleConfiguration() {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
+
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+      s.replace(F("#configuracoesActive#"), "active");
+    }  
+    
+    s.replace(F("#id#"), id);
+    s.replace(F("#tipo#"), tipo);
     s.replace(F("#ssid#"), ssid);
     s.replace(F("#broker#"), broker);
     s.replace(F("#timeout#"), String(timeout));
@@ -145,7 +167,17 @@ void handleReboot(){
 }
 
 void handleBoxPw(){
-    String pw, rpw;
+String s, pw, rpw;
+    if(server.hasArg("id")){
+      s = server.arg("id");
+      s.trim();
+      strlcpy(id, s.c_str(), sizeof(id));
+    }  
+    if(server.hasArg("tipo")){
+      s = server.arg("tipo");
+      s.trim();
+      strlcpy(tipo, s.c_str(), sizeof(tipo));
+    }  
   
     if(server.hasArg("oldPassword")){      
       pw = server.arg("oldPassword");
@@ -185,12 +217,23 @@ void handleBoxPw(){
 }
 
 void handleSensores() {
+  
+  
   File file = SPIFFS.open(F("/sensores.html"), "r");
   if (file) {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
 
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+      s.replace(F("#sensoresActive#"), "active");
+    }  
+  
     if(nivelOn){
        s.replace(F("#btn-nivel-cor#"), "btn-danger");
        s.replace(F("#text-nivel#"), "Desconectar");
@@ -240,6 +283,15 @@ void handleAtuadores() {
     file.setTimeout(100);
     String s = file.readString();
     file.close();
+
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+      s.replace(F("#atuadoresActive#"), "active");
+    }  
 
     server.send(200, F("text/html"), s);
     log("Atuadores - Cliente: " + ipStr(server.client().remoteIP()) +

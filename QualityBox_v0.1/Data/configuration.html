@@ -13,37 +13,7 @@
 </head>
 
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
-        <div class="container">
-            <a class="navbar-brand" href="home">Quality Box</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto px-5">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="config">Configurações</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="sensores">Sensores</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="atuadores">Atuadores</a>
-                    </li>
-                </ul>
-                <div>
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="logout">Sair</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <navMenu></navMenu>
 
     <div class="container">
         <div class="row">
@@ -108,10 +78,26 @@
                 </form>
             </div>
             <div class="col-sm mb-5">
-                <p class="font-weight-normal h5">Trocar senha do box</p>
+                <p class="font-weight-normal h5">Configurações do box</p>
                 <hr>
                 <form class="py-4" name="config" action="postBoxSave" method="post">
                     <div class="container pb-2">
+                        <div class="form-group row">
+                            <label for="id" class="col-sm-3 col-form-label">Id do Box</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="id" name="id"
+                                    value="#id#">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="tipo" class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="tipo" name="tipo"
+                                    value="#tipo#">
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="font-weight-normal h5 py-3">Trocar senha do Box</p>
                         <div class="form-group row">
                             <label for="oldPassword" class="col-sm-3 col-form-label">Senha Antiga</label>
                             <div class="col-sm-9">
