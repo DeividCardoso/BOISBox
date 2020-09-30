@@ -2,13 +2,18 @@
 <html lang="pt-BR">
 
 <head>
+  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="bootstrap">
+
   <title>Quality Box</title>
 </head>
 
 <body>
+
   <navMenu></navMenu>
 
   <div class="container">
@@ -24,9 +29,10 @@
               <th scope="row">Nível</th>
               <td>#valorNivel# %</td>
               <td>
-                <a href="calibrarNivel" class="btn btn-sm btn-outline-primary btn-block m-0" #calibrarDisabled#>Calibrar</a>
+                <a href="calibrarNivel" class="btn btn-sm btn-outline-primary btn-block m-0"
+                  #calibrarDisabled#>Calibrar</a>
                 <!--<button type="button" class="btn btn-sm btn-outline-primary btn-block m-0" disabled>Calibrar</button>-->
-               
+
               </td>
               <td>
 
@@ -37,12 +43,12 @@
               <th scope="row">Temperatura</th>
               <td>#valorTemperatura# °C</td>
               <td>
-                
+
                 <button type="button" class="btn btn-sm btn-outline-primary btn-block m-0" disabled>Calibrar</button>
-               
+
               </td>
               <td>
-                <a href="onOffTemperatura" class="btn btn-sm #btn-temperatura-cor# btn-block m-0">#text-temperatura#</a>              
+                <a href="onOffTemperatura" class="btn btn-sm #btn-temperatura-cor# btn-block m-0">#text-temperatura#</a>
               </td>
             </tr>
             <tr>
@@ -72,10 +78,38 @@
       <div class="col-sm mb-5">
         <p class="font-weight-normal h5">Calibração</p>
         <hr>
+        <p class="font-weight-normal h5">Nível</p>
+        <p class="font-weight-normal text-danger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;É importante que a medida esteja
+          estabilizada antes de salvar seu valor. Salve o valor do tanque cheio e do tanque vazio.</p>
+
+        <table class="table">
+          <thead>
+            <th>
+              Medido
+            </th>
+            <th>
+              Valor
+            </th>
+          </thead>
+          <tbody>
+            <td scope="row">
+              #valorNivel# %
+              <a href="atualizarMedicao" class="btn btn-outline-secondary btn-sm">Atualizar medição</a>
+            </td>
+            <td>
+              <div class="input-group input-group-sm mb-3">
+                <a href="medicaoMaximo" class="btn btn-outline-info btn-sm">Cheio</a>
+                <a href="medicaoMinimo" class="btn btn-outline-danger btn-sm">Vazio</a>
+              </div>
+            </td>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="jquery"></script>
   <script src="bootstrap-js"></script>
 </body>

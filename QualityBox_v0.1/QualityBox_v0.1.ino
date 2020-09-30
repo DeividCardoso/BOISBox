@@ -299,6 +299,14 @@ void setup() {
   server.on(F("/atuadores")  , handleAtuadores);
   server.on(F("/json")  , handleJsonPage);
   server.on(F("/reconfig")  , handleReconfig);
+  server.on(F("/onOffNivel")  , handleToggleNivel);
+  server.on(F("/onOffTemperatura")  , handleToggleTemperatura);
+  server.on(F("/onOffPH")  , handleTogglePH);
+  server.on(F("/onOffVazao")  , handleToggleVazao);
+  server.on(F("/calibrarNivel")  , handleCalibrarNivel);
+  server.on(F("/atualizarMedicao")  , handleAtualizarMedicao);
+  server.on(F("/medicaoMinimo")  , handleMedicaoMinimo);
+  server.on(F("/medicaoMaximo")  , handleMedicaoMaximo);
 
   // Recursos CSS e JS
   server.on(F("/bootstrap"), handleBootstrap);

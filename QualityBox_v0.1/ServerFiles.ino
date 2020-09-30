@@ -235,37 +235,56 @@ void handleSensores() {
     }  
   
     if(nivelOn){
+       double valorNivel = leSensorNivel();
+       String svalorNivel = String(valorNivel);      
        s.replace(F("#btn-nivel-cor#"), "btn-danger");
        s.replace(F("#text-nivel#"), "Desconectar");
+       s.replace(F("#valorNivel#"), svalorNivel);
     }
     else {
        s.replace(F("#btn-nivel-cor#"), "btn-primary");
        s.replace(F("#text-nivel#"), "Conectar");
+       s.replace(F("#valorNivel#"), " - - ");
     }
 
     if(phOn){
+       double valorPH = leSensorPH();
+       String svalorPH = String(valorPH);
+       
        s.replace(F("#btn-ph-cor#"), "btn-danger");
        s.replace(F("#text-ph#"), "Desconectar");
+       s.replace(F("#valorPH#"), svalorPH);
     }
     else {
        s.replace(F("#btn-ph-cor#"), "btn-primary");
        s.replace(F("#text-ph#"), "Conectar");
+       s.replace(F("#valorPH#"), " - - ");
     }
      if(temperaturaOn){
+       double valorTemperatura = leSensorTemperatura();
+       String svalorTemperatura = String(valorTemperatura);
+       
        s.replace(F("#btn-temperatura-cor#"), "btn-danger");
        s.replace(F("#text-temperatura#"), "Desconectar");
+       s.replace(F("#valorTemperatura#"), svalorTemperatura);
     }
     else {
        s.replace(F("#btn-temperatura-cor#"), "btn-primary");
        s.replace(F("#text-temperatura#"), "Conectar");
+       s.replace(F("#valorTemperatura#"), " - - ");
     }
      if(vazaoOn){
+       double valorVazao = leSensorVazao();
+       String svalorVazao = String(valorVazao);
+       
        s.replace(F("#btn-vazao-cor#"), "btn-danger");
        s.replace(F("#text-vazao#"), "Desconectar");
+       s.replace(F("#valorVazao#"), svalorVazao);
     }
     else {
        s.replace(F("#btn-vazao-cor#"), "btn-primary");
        s.replace(F("#text-vazao#"), "Conectar");
+       s.replace(F("#valorVazao#"), " - - ");
     }
 
     server.send(200, F("text/html"), s);
@@ -276,6 +295,102 @@ void handleSensores() {
     log(F("Sensores - ERRO lendo arquivo"));
   }
 }
+
+void handleCalibrarNivel(){  
+  File file = SPIFFS.open(F("/sensores-calib-nivel.html"), "r");
+  if (file) {
+    file.setTimeout(100);
+    String s = file.readString();
+    file.close();
+
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+      s.replace(F("#sensoresActive#"), "active");
+    }  
+  
+    if(nivelOn){
+       double valorNivel = leSensorNivel();
+       String svalorNivel = String(valorNivel);      
+       s.replace(F("#btn-nivel-cor#"), "btn-danger");
+       s.replace(F("#text-nivel#"), "Desconectar");
+       s.replace(F("#valorNivel#"), svalorNivel);
+    }
+    else {
+       s.replace(F("#btn-nivel-cor#"), "btn-primary");
+       s.replace(F("#text-nivel#"), "Conectar");
+       s.replace(F("#valorNivel#"), " - - ");
+    }
+
+    if(phOn){
+       double valorPH = leSensorPH();
+       String svalorPH = String(valorPH);
+       
+       s.replace(F("#btn-ph-cor#"), "btn-danger");
+       s.replace(F("#text-ph#"), "Desconectar");
+       s.replace(F("#valorPH#"), svalorPH);
+    }
+    else {
+       s.replace(F("#btn-ph-cor#"), "btn-primary");
+       s.replace(F("#text-ph#"), "Conectar");
+       s.replace(F("#valorPH#"), " - - ");
+    }
+     if(temperaturaOn){
+       double valorTemperatura = leSensorTemperatura();
+       String svalorTemperatura = String(valorTemperatura);
+       
+       s.replace(F("#btn-temperatura-cor#"), "btn-danger");
+       s.replace(F("#text-temperatura#"), "Desconectar");
+       s.replace(F("#valorTemperatura#"), svalorTemperatura);
+    }
+    else {
+       s.replace(F("#btn-temperatura-cor#"), "btn-primary");
+       s.replace(F("#text-temperatura#"), "Conectar");
+       s.replace(F("#valorTemperatura#"), " - - ");
+    }
+     if(vazaoOn){
+       double valorVazao = leSensorVazao();
+       String svalorVazao = String(valorVazao);
+       
+       s.replace(F("#btn-vazao-cor#"), "btn-danger");
+       s.replace(F("#text-vazao#"), "Desconectar");
+       s.replace(F("#valorVazao#"), svalorVazao);
+    }
+    else {
+       s.replace(F("#btn-vazao-cor#"), "btn-primary");
+       s.replace(F("#text-vazao#"), "Conectar");
+       s.replace(F("#valorVazao#"), " - - ");
+    }
+
+    server.send(200, F("text/html"), s);
+    log("Sensores - Cliente: " + ipStr(server.client().remoteIP()) +
+        (server.uri() != "/" ? " [" + server.uri() + "]" : ""));
+  } else {
+    server.send(500, F("text/plain"), F("Sensores - ERROR 500"));
+    log(F("Sensores - ERRO lendo arquivo"));
+  }
+}
+
+void handleAtualizarMedicao(){
+  server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleMedicaoMinimo(){
+  setNivelMinimo();
+  server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleMedicaoMaximo(){
+  setNivelMaximo();
+  server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
 
 void handleAtuadores() {
   File file = SPIFFS.open(F("/atuadores.html"), "r");
@@ -316,6 +431,30 @@ void handleJsonPage() {
     server.send(500, F("text/plain"), F("Json - ERROR 500"));
     log(F("Json - ERRO lendo arquivo"));
   }
+}
+
+void handleToggleNivel(){
+  nivelOn = !nivelOn;
+  server.sendHeader("Location", "/sensores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleTemperatura(){
+  temperaturaOn = !temperaturaOn;
+  server.sendHeader("Location", "/sensores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleTogglePH(){
+  phOn = !phOn;
+  server.sendHeader("Location", "/sensores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleVazao(){
+  vazaoOn = !vazaoOn;
+  server.sendHeader("Location", "/sensores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
 }
 
 void handleReconfig() {

@@ -58,9 +58,9 @@ void trigPulse()
 }
 
 float retornaNivel(float distancia){  
-  return 100 - (100/(tanqueCheio - tanqueVazio))*(distancia - tanqueVazio);  
+  return (100/(tanqueCheio - tanqueVazio))*(distancia - tanqueVazio);  
 }
 
 float retornaNivel(){  
-  return 100 - (100/(tanqueCheio - tanqueVazio))*(retornaDistancia() - tanqueVazio);  
+  return (100/(tanqueCheio - tanqueVazio))*(retornaDistancia() - tanqueVazio);  
 }
