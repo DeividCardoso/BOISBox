@@ -5,12 +5,15 @@
 #include <TimeLib.h>
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
 
 // Mapeamento de Hardware ----------------------------
 //Nivel
 #define trig 5  
 #define echo 4  
-
+#define oneWireBus 19
 
 // Constantes MQTT -----------------------------------
 const char* mqtt_server = "ec2-18-207-3-216.compute-1.amazonaws.com"; //mqtt server
@@ -23,6 +26,7 @@ const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
+const int         LEITURAS_SENSOR         = 20;
 
 
 WiFiClient espClient;
@@ -30,6 +34,9 @@ PubSubClient client(espClient); //lib required for mqtt
 
 WebServer  server(WEBSERVER_PORT);
 DNSServer         dnsServer;
+
+OneWire oneWire(oneWireBus);
+DallasTemperature sensors(&oneWire);
 
 // Variáveis Globais ------------------------------------
 char              id[30];       // Identificação do dispositivo
@@ -45,7 +52,11 @@ boolean           phOn;
 boolean           vazaoOn;
 boolean           nivelOn;
 boolean           temperaturaOn;
-
+int               contador = 0;
+float             mediaPH[LEITURAS_SENSOR];
+float             mediaNivel[LEITURAS_SENSOR];
+float             mediaVazao[LEITURAS_SENSOR];
+float             mediaTemperatura[LEITURAS_SENSOR];
 
 // Funções Genéricas ------------------------------------
 void log(String s) {
@@ -205,47 +216,84 @@ void reconnect() {
 
 
 // Sensores ----------------------------------------
-bool leSensores(){
-  StaticJsonDocument<300> doc;
-  doc["id"] = id;
-  doc["tipo"] = tipo;
-  JsonObject pH = doc.createNestedObject("ph");
-  pH["conectado"] = phOn;
-  pH["valor"] = leSensorPH();
-  JsonObject temp = doc.createNestedObject("temperatura");
-  temp["conectado"] = temperaturaOn;
-  temp["valor"] = leSensorTemperatura();
-  JsonObject vazao = doc.createNestedObject("vazao");
-  vazao["conectado"] = vazaoOn;
-  vazao["valor"] = leSensorVazao();
-  JsonObject nivel = doc.createNestedObject("nivel");
-  nivel["conectado"] = nivelOn;
-  nivel["valor"] = leSensorNivel();
+bool leSensores(){   
+  if(contador == LEITURAS_SENSOR){
+    StaticJsonDocument<300> doc;
+    doc["id"] = id;
+    doc["tipo"] = tipo;
+    JsonObject pH = doc.createNestedObject("ph");
+    pH["conectado"] = phOn;
+    pH["valor"] = mediaLeitura(mediaPH, LEITURAS_SENSOR, false);
+    JsonObject temp = doc.createNestedObject("temperatura");
+    temp["conectado"] = temperaturaOn;
+    temp["valor"] = mediaLeitura(mediaTemperatura, LEITURAS_SENSOR, false);
+    JsonObject vazao = doc.createNestedObject("vazao");
+    vazao["conectado"] = vazaoOn;
+    vazao["valor"] = mediaLeitura(mediaVazao, LEITURAS_SENSOR, false);
+    JsonObject nivel = doc.createNestedObject("nivel");
+    nivel["conectado"] = nivelOn;
+    nivel["valor"] = mediaLeitura(mediaNivel, LEITURAS_SENSOR, false);
+
+    serializeJson(doc, Serial);
   
-
-  // Generate the minified JSON and send it to the Serial port.
-  serializeJson(doc, Serial);
-  //Serial.println();
-
-  char buffer[256];
-  size_t n = serializeJson(doc, buffer);
-  return client.publish(publishTopic, buffer, n);
+    char buffer[256];
+    size_t n = serializeJson(doc, buffer);
+    
+    contador = 0;
+    return client.publish(publishTopic, buffer, n);
+  }
+  else{
+    phOn ? mediaPH[contador] = leSensorPH() : mediaPH[contador] = 0;
+    nivelOn ? mediaNivel[contador] = leSensorNivel() : mediaNivel[contador] = 0;
+    vazaoOn ? mediaVazao[contador] = leSensorVazao() : mediaVazao[contador] = 0;
+    temperaturaOn ? mediaTemperatura[contador] = leSensorTemperatura() : mediaTemperatura[contador] = 0;
+    contador++;
+    return false;
+  }
 }
 
-double leSensorPH(){
-  return (double) random(500, 700) / 100;
+float mediaLeitura(float sensor[], int arraySize, bool contaZerados){
+  float resultado = 0;
+  int valoresZero = 0;
+  
+  for(int i = 0; i < arraySize; i++){
+    if(contaZerados && sensor[i] == 0)
+    {
+      valoresZero++;
+    }
+      
+    resultado += sensor[i];
+    Serial.print("Resultado: ");
+    Serial.println(resultado);
+  }
+
+  if(contaZerados){
+    return resultado/(arraySize - valoresZero);
+  }
+  else{
+    return resultado/arraySize;
+  }  
+}
+
+float leSensorPH(){
+  return (float) random(500, 700) / 100;
 }
 
 float leSensorNivel(){
-  return retornaNivel();
+  float nivel = retornaNivel();
+  Serial.print("Nivel: ");
+  Serial.println(nivel);
+  return nivel;
 }
 
-double leSensorVazao(){
-  return (double) random(0, 1000 / 100);
+float leSensorVazao(){
+  return (float) random(0, 1000 / 100);
 }
 
-double leSensorTemperatura(){
-  return (double) random(1000, 3000) /100;
+float leSensorTemperatura(){
+  sensors.requestTemperatures(); 
+  float temperatureC = sensors.getTempCByIndex(0);
+  return temperatureC;
 }
 
 // Setup -------------------------------------------
@@ -339,6 +387,7 @@ void setup() {
   if(!bkrOn){
     log("Notificações desabilitadas!");
   }
+  sensors.begin();
   log(F("Pronto"));
 }
 
