@@ -26,7 +26,7 @@ const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
-const int         LEITURAS_SENSOR         = 20;
+const int         LEITURAS_SENSOR         = 10;
 
 
 WiFiClient espClient;
@@ -355,6 +355,7 @@ void setup() {
   server.on(F("/atualizarMedicao")  , handleAtualizarMedicao);
   server.on(F("/medicaoMinimo")  , handleMedicaoMinimo);
   server.on(F("/medicaoMaximo")  , handleMedicaoMaximo);
+  server.on(F("/resetarNivel")  , handleResetNivel);
 
   // Recursos CSS e JS
   server.on(F("/bootstrap"), handleBootstrap);

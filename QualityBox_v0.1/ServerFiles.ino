@@ -391,6 +391,12 @@ void handleMedicaoMaximo(){
   server.send(302, "text/plane",""); 
 }
 
+void handleResetNivel(){
+  resetaSensorNivel();
+  server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
 
 void handleAtuadores() {
   File file = SPIFFS.open(F("/atuadores.html"), "r");

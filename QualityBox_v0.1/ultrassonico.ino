@@ -36,7 +36,7 @@ float retornaDistancia(){
   float somaDistancia = 0;
   int nMedidas = 0;
   
-  for (int i = 0; i < 20; i++){    
+  for (int i = 0; i < 5; i++){    
          trigPulse();
          tempoPulso = pulseIn(echo, HIGH, 200000);
           distanciaCalculada = tempoPulso/58.82;                  //58.82 Valor de conversão - Datasheet
