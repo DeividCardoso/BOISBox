@@ -1,27 +1,21 @@
-float tanqueVazio = 0, tanqueCheio = 100;
+float tanqueVazio = 100, tanqueCheio = 0;
 int opcao = 0;
 
 bool setNivelMinimo(){
   float distancia = retornaDistancia();
-  if(distancia < tanqueCheio){
-    tanqueVazio = distancia;
-    return true;
-  }
-  return false;
+  tanqueVazio = distancia;
+  return true;
 }
 
 bool setNivelMaximo(){
   float distancia = retornaDistancia();
-  if(distancia > tanqueVazio){
-    tanqueCheio = distancia;
-    return true;
-  }
-  return false;
+  tanqueCheio = distancia;
+  return true;
 }
 
 void resetaSensorNivel(){
-  tanqueVazio = 0;
-  tanqueCheio = 100;
+  tanqueVazio = 100;
+  tanqueCheio = 0;
 }
 
 void configuraUltrassonico(){  
@@ -40,7 +34,7 @@ float retornaDistancia(){
          trigPulse();
          tempoPulso = pulseIn(echo, HIGH, 200000);
           distanciaCalculada = tempoPulso/58.82;                  //58.82 Valor de conversão - Datasheet
-         if(distanciaCalculada != 0 && distanciaCalculada < 100)
+         if(distanciaCalculada != 0 && distanciaCalculada < 200)
          {
             somaDistancia += distanciaCalculada;
             nMedidas++;

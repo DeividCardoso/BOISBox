@@ -14,6 +14,7 @@
 #define trig 5  
 #define echo 4  
 #define oneWireBus 19
+const int portaVazao = GPIO_NUM_21;
 
 // Constantes MQTT -----------------------------------
 const char* mqtt_server = "ec2-18-207-3-216.compute-1.amazonaws.com"; //mqtt server
@@ -57,6 +58,9 @@ float             mediaPH[LEITURAS_SENSOR];
 float             mediaNivel[LEITURAS_SENSOR];
 float             mediaVazao[LEITURAS_SENSOR];
 float             mediaTemperatura[LEITURAS_SENSOR];
+double            vazao = 0;
+double            acumuladoVazao = 0;
+double            fatorConversao = 0;
 
 // Funções Genéricas ------------------------------------
 void log(String s) {
@@ -217,8 +221,10 @@ void reconnect() {
 
 // Sensores ----------------------------------------
 bool leSensores(){   
+  //double svazao = vazao;
+  
   if(contador == LEITURAS_SENSOR){
-    StaticJsonDocument<300> doc;
+    StaticJsonDocument<1024> doc;
     doc["id"] = id;
     doc["tipo"] = tipo;
     JsonObject pH = doc.createNestedObject("ph");
@@ -229,17 +235,22 @@ bool leSensores(){
     temp["valor"] = mediaLeitura(mediaTemperatura, LEITURAS_SENSOR, false);
     JsonObject vazao = doc.createNestedObject("vazao");
     vazao["conectado"] = vazaoOn;
-    vazao["valor"] = mediaLeitura(mediaVazao, LEITURAS_SENSOR, false);
+    JsonArray valores = vazao.createNestedArray("valores");    
+    for(int i = 0; i < LEITURAS_SENSOR; i++){
+      valores.add(mediaVazao[i]);
+    }
+//    vazao["valor"] = mediaLeitura(mediaVazao, LEITURAS_SENSOR, false);
     JsonObject nivel = doc.createNestedObject("nivel");
     nivel["conectado"] = nivelOn;
     nivel["valor"] = mediaLeitura(mediaNivel, LEITURAS_SENSOR, false);
 
+
     serializeJson(doc, Serial);
-  
-    char buffer[256];
-    size_t n = serializeJson(doc, buffer);
-    
     contador = 0;
+    
+    char buffer[256];
+    size_t n = serializeJson(doc, buffer);   
+    
     return client.publish(publishTopic, buffer, n);
   }
   else{
@@ -263,8 +274,8 @@ float mediaLeitura(float sensor[], int arraySize, bool contaZerados){
     }
       
     resultado += sensor[i];
-    Serial.print("Resultado: ");
-    Serial.println(resultado);
+//    Serial.print("sensor: ");
+//    Serial.println(resultado);
   }
 
   if(contaZerados){
@@ -281,13 +292,13 @@ float leSensorPH(){
 
 float leSensorNivel(){
   float nivel = retornaNivel();
-  Serial.print("Nivel: ");
-  Serial.println(nivel);
+//  Serial.print("Nivel: ");
+//  Serial.println(nivel);
   return nivel;
 }
 
-float leSensorVazao(){
-  return (float) random(0, 1000 / 100);
+double leSensorVazao(){
+  return vazao;
 }
 
 float leSensorTemperatura(){
@@ -352,6 +363,7 @@ void setup() {
   server.on(F("/onOffPH")  , handleTogglePH);
   server.on(F("/onOffVazao")  , handleToggleVazao);
   server.on(F("/calibrarNivel")  , handleCalibrarNivel);
+  server.on(F("/calibrarVazao"), handleCalibraVazao);
   server.on(F("/atualizarMedicao")  , handleAtualizarMedicao);
   server.on(F("/medicaoMinimo")  , handleMedicaoMinimo);
   server.on(F("/medicaoMaximo")  , handleMedicaoMaximo);
@@ -368,7 +380,8 @@ void setup() {
   server.on(F("/reboot"), handleReboot);
   server.on(F("/postBoxSave"), handleBoxPw);
   server.on(F("/loginCheck"), HTTP_POST, handleLoginCheck);
-
+  server.on(F("/postCalibraVazao"), HTTP_POST, handleSaveCalibVazao);
+  
   server.onNotFound(handleLogin);
   server.collectHeaders(WEBSERVER_HEADER_KEYS, 1);
   server.begin();
@@ -382,13 +395,19 @@ void setup() {
   if(WiFi.status() == WL_CONNECTED){
     connectmqtt();
   }  
+
+  // Sensores
+  configuraUltrassonico();    //Ultrassonico
+  sensors.begin();            //Temperatura
+  iniciaVazao((gpio_num_t) portaVazao); //vazao
+  startTimer();
+
   
-  configuraUltrassonico();
   // Pronto
   if(!bkrOn){
     log("Notificações desabilitadas!");
   }
-  sensors.begin();
+  
   log(F("Pronto"));
 }
 
@@ -410,16 +429,17 @@ void loop() {
     }
   } 
   else{
+    
   // Negocio --------------------------
     if(bkrOn){
       if(leSensores()){
         log("\nPublicado com sucesso!");
       }
-      else{
-        log("\nFalhou a publicação");
+      else if(contador == 0){
+        log("\nFalha na publicação!");
       }
-      //delay(2000);
     }
   }  
+  
   client.loop();
 }
