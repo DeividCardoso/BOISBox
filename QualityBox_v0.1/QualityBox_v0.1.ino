@@ -27,7 +27,7 @@ const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
-const int         LEITURAS_SENSOR         = 10;
+const int         LEITURAS_SENSOR         = 3;
 
 
 WiFiClient espClient;
@@ -60,7 +60,7 @@ float             mediaVazao[LEITURAS_SENSOR];
 float             mediaTemperatura[LEITURAS_SENSOR];
 double            vazao = 0;
 double            acumuladoVazao = 0;
-double            fatorConversao = 0;
+double            fatorConversao = 7.5;
 
 // Funções Genéricas ------------------------------------
 void log(String s) {
@@ -220,9 +220,7 @@ void reconnect() {
 
 
 // Sensores ----------------------------------------
-bool leSensores(){   
-  //double svazao = vazao;
-  
+bool leSensores(){     
   if(contador == LEITURAS_SENSOR){
     StaticJsonDocument<1024> doc;
     doc["id"] = id;
@@ -234,12 +232,8 @@ bool leSensores(){
     temp["conectado"] = temperaturaOn;
     temp["valor"] = mediaLeitura(mediaTemperatura, LEITURAS_SENSOR, false);
     JsonObject vazao = doc.createNestedObject("vazao");
-    vazao["conectado"] = vazaoOn;
-    JsonArray valores = vazao.createNestedArray("valores");    
-    for(int i = 0; i < LEITURAS_SENSOR; i++){
-      valores.add(mediaVazao[i]);
-    }
-//    vazao["valor"] = mediaLeitura(mediaVazao, LEITURAS_SENSOR, false);
+    vazao["conectado"] = vazaoOn;    
+    vazao["valor"] = acumuladoVazao;
     JsonObject nivel = doc.createNestedObject("nivel");
     nivel["conectado"] = nivelOn;
     nivel["valor"] = mediaLeitura(mediaNivel, LEITURAS_SENSOR, false);
@@ -368,6 +362,7 @@ void setup() {
   server.on(F("/medicaoMinimo")  , handleMedicaoMinimo);
   server.on(F("/medicaoMaximo")  , handleMedicaoMaximo);
   server.on(F("/resetarNivel")  , handleResetNivel);
+  server.on(F("/zeraConsumo")  , handleZeraConsumo);
 
   // Recursos CSS e JS
   server.on(F("/bootstrap"), handleBootstrap);
@@ -380,7 +375,7 @@ void setup() {
   server.on(F("/reboot"), handleReboot);
   server.on(F("/postBoxSave"), handleBoxPw);
   server.on(F("/loginCheck"), HTTP_POST, handleLoginCheck);
-  server.on(F("/postCalibraVazao"), HTTP_POST, handleSaveCalibVazao);
+  server.on(F("/postCalibraVazao"), HTTP_POST, handleSaveCalibVazao);  
   
   server.onNotFound(handleLogin);
   server.collectHeaders(WEBSERVER_HEADER_KEYS, 1);

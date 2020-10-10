@@ -40,15 +40,19 @@ void handleLoginCheck() {
 }
 
 void handleSaveCalibVazao(){
-  if(server.hasArg("vazao")){     
-      String vazao = server.arg("vazao");      
-      vazao.trim();
-      fatorConversao = vazao.toDouble();      
+  if(server.hasArg("fc")){     
+      String fc = server.arg("fc");      
+      fc.trim();
+      fatorConversao = fc.toDouble();      
+      Serial.print("FC: ");
+      Serial.println(fatorConversao);
+      server.send(200, F("text/html"), F("<html><meta charset='UTF-8'><script>alert('Fator de Conversão atualizado.');history.back()</script></html>"));      
     }
     else{
-      server.sendHeader("Location", "/",true);
+      server.sendHeader("Location", "/calibrarVazao",true);
       server.send(302, "text/plane",""); 
     }
+
 }
 
 void handleHome() {
@@ -229,8 +233,6 @@ String s, pw, rpw;
 }
 
 void handleSensores() {
-  
-  
   File file = SPIFFS.open(F("/sensores.html"), "r");
   if (file) {
     file.setTimeout(100);
@@ -285,13 +287,12 @@ void handleSensores() {
        s.replace(F("#text-temperatura#"), "Conectar");
        s.replace(F("#valorTemperatura#"), " - - ");
     }
-     if(vazaoOn){
-       double valorVazao = leSensorVazao();
-       String svalorVazao = String(valorVazao);
+     if(vazaoOn){        
+       String ac = String(acumuladoVazao/1000);
        
        s.replace(F("#btn-vazao-cor#"), "btn-danger");
        s.replace(F("#text-vazao#"), "Desconectar");
-       s.replace(F("#valorVazao#"), svalorVazao);
+       s.replace(F("#valorVazao#"), ac);
     }
     else {
        s.replace(F("#btn-vazao-cor#"), "btn-primary");
@@ -364,12 +365,11 @@ void handleCalibrarNivel(){
        s.replace(F("#valorTemperatura#"), " - - ");
     }
      if(vazaoOn){
-       double valorVazao = leSensorVazao();
-       String svalorVazao = String(valorVazao);
+       String ac = String(acumuladoVazao/1000);
        
        s.replace(F("#btn-vazao-cor#"), "btn-danger");
        s.replace(F("#text-vazao#"), "Desconectar");
-       s.replace(F("#valorVazao#"), svalorVazao);
+       s.replace(F("#valorVazao#"), ac);
     }
     else {
        s.replace(F("#btn-vazao-cor#"), "btn-primary");
@@ -442,13 +442,12 @@ void handleCalibraVazao(){
        s.replace(F("#valorTemperatura#"), " - - ");
     }
      if(vazaoOn){
-       double valorVazao = leSensorVazao();
-       String svalorVazao = String(valorVazao);
        String fc = String(fatorConversao);
+       String ac = String(acumuladoVazao/1000);
        
        s.replace(F("#btn-vazao-cor#"), "btn-danger");
        s.replace(F("#text-vazao#"), "Desconectar");
-       s.replace(F("#valorVazao#"), svalorVazao);
+       s.replace(F("#valorVazao#"), ac);
        s.replace(F("#fatorConversao#"), fc);
     }
     else {
@@ -489,6 +488,11 @@ void handleResetNivel(){
   server.send(302, "text/plane",""); 
 }
 
+void handleZeraConsumo(){
+  acumuladoVazao = 0;
+  server.sendHeader("Location", "/calibrarVazao",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
 
 void handleAtuadores() {
   File file = SPIFFS.open(F("/atuadores.html"), "r");

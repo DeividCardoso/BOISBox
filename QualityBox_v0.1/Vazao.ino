@@ -24,7 +24,7 @@ void cb_timer(){
 //    Serial.print("Pulsos: ");
 //    Serial.println(pulsos_vazao);
     
-    vazao = pulsos_vazao * 8;           //8 = Fator de Conversao                                  
+    vazao = pulsos_vazao * fatorConversao;           //8 = Fator de Conversao                                  
     vazao = vazao * 0.278;              //Converte de L/H para ml/s                                    
     acumuladoVazao += vazao;            //Consumo total                           
   
