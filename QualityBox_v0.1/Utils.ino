@@ -22,7 +22,7 @@ String longTimeStr(const time_t &t){
 
 String deviceID() {
   // Retorna ID padrão ESP32 utiliza função getEfuseMac()
-  return "IeC-" + hexStr(ESP.getEfuseMac());
+  return "QualityBox - " + hexStr(ESP.getEfuseMac());
 }
 
 String ipStr(const IPAddress &ip) {
