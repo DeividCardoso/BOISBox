@@ -465,6 +465,107 @@ void handleCalibraVazao(){
   }
 }
 
+void handleCalibraPH(){  
+  File file = SPIFFS.open(F("/sensores-calib-ph.html"), "r");
+  if (file) {
+    file.setTimeout(100);
+    String s = file.readString();
+    file.close();
+
+    File navMenu = SPIFFS.open(F("/navMenu.html"), "r");
+    if (navMenu) {
+      navMenu.setTimeout(100);
+      String snavMenu = navMenu.readString();
+      navMenu.close(); 
+      s.replace(F("<navMenu></navMenu>"), snavMenu);
+      s.replace(F("#sensoresActive#"), "active");
+    }  
+  
+    if(nivelOn){
+       double valorNivel = leSensorNivel();
+       String svalorNivel = String(valorNivel);      
+       s.replace(F("#btn-nivel-cor#"), "btn-danger");
+       s.replace(F("#text-nivel#"), "Desconectar");
+       s.replace(F("#valorNivel#"), svalorNivel);
+    }
+    else {
+       s.replace(F("#btn-nivel-cor#"), "btn-primary");
+       s.replace(F("#text-nivel#"), "Conectar");
+       s.replace(F("#valorNivel#"), " - - ");
+    }
+
+    if(phOn){
+       double valorPH = leSensorPH();
+       String svalorPH = String(valorPH);
+       
+       s.replace(F("#btn-ph-cor#"), "btn-danger");
+       s.replace(F("#text-ph#"), "Desconectar");
+       s.replace(F("#valorPH#"), svalorPH);
+    }
+    else {
+       s.replace(F("#btn-ph-cor#"), "btn-primary");
+       s.replace(F("#text-ph#"), "Conectar");
+       s.replace(F("#valorPH#"), " - - ");
+    }
+     if(temperaturaOn){
+       double valorTemperatura = leSensorTemperatura();
+       String svalorTemperatura = String(valorTemperatura);
+       
+       s.replace(F("#btn-temperatura-cor#"), "btn-danger");
+       s.replace(F("#text-temperatura#"), "Desconectar");
+       s.replace(F("#valorTemperatura#"), svalorTemperatura);
+    }
+    else {
+       s.replace(F("#btn-temperatura-cor#"), "btn-primary");
+       s.replace(F("#text-temperatura#"), "Conectar");
+       s.replace(F("#valorTemperatura#"), " - - ");
+    }
+     if(vazaoOn){
+       String fc = String(fatorConversao);
+       String ac = String(acumuladoVazao/1000);
+       
+       s.replace(F("#btn-vazao-cor#"), "btn-danger");
+       s.replace(F("#text-vazao#"), "Desconectar");
+       s.replace(F("#valorVazao#"), ac);
+       s.replace(F("#fatorConversao#"), fc);
+    }
+    else {
+       s.replace(F("#btn-vazao-cor#"), "btn-primary");
+       s.replace(F("#text-vazao#"), "Conectar");
+       s.replace(F("#valorVazao#"), " - - ");
+    }
+
+    server.send(200, F("text/html"), s);
+    log("Sensores - Cliente: " + ipStr(server.client().remoteIP()) +
+        (server.uri() != "/" ? " [" + server.uri() + "]" : ""));
+  } else {
+    server.send(500, F("text/plain"), F("Sensores - ERROR 500"));
+    log(F("Sensores - ERRO lendo arquivo"));
+  }
+}
+
+void handleSetPH4(){
+//  setNivelMaximo();
+  vpH4 = voltagePH;
+  server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
+  server.send(302, "text/plane","");
+}
+
+void handleSetPH7(){
+//  setNivelMaximo();
+  vpH7 = voltagePH;
+  server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
+  server.send(302, "text/plane","");
+}
+
+void handleResetPH(){
+  vpH4 = 2.35;
+  vpH7 = 1.97;
+  server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
+  server.send(302, "text/plane","");
+}
+
+
 void handleAtualizarMedicao(){
   server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 

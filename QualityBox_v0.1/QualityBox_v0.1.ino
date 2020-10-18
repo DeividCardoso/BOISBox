@@ -29,7 +29,7 @@ const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
 const int         LEITURAS_SENSOR         = 3;
-const float       m                       = -7.32;
+//const float       m                       = -7.32;
 
 
 WiFiClient espClient;
@@ -63,8 +63,14 @@ float             mediaTemperatura[LEITURAS_SENSOR];
 double            vazao = 0;
 double            acumuladoVazao = 0;
 double            fatorConversao = 7.5;
-float             calibraPH = 0;
+//pH
 unsigned long int avgValue;
+float             voltagePH = 0;
+float             vpH4 = 2.35;
+float             vpH7 = 1.97;
+
+
+
 
 // Funções Genéricas ------------------------------------
 void log(String s) {
@@ -317,15 +323,16 @@ float leSensorPH(){
   float voltage=((float)avgValue*3.3)/4095; //convert the analog into millivolt
   Serial.print("Conversão de bits para tensão: ");
   Serial.println(voltage);
+  voltagePH = voltage;
+
+  float m = (7 - 4)/(vpH7 - vpH4);
+
+  Serial.print("m: ");
+  Serial.println(m);
   
-  float phValue = 7 - (1.91 - voltage) * m;                      //convert the millivolt into pH value
+  float phValue = 7 - (vpH7 - voltage) * m;                      //convert the millivolt into pH value
   Serial.print("Conversão para pH: ");  
   Serial.println(phValue,2);
-
-  phValue = phValue + calibraPH;
-  
-  Serial.print("pH calibrado: ");
-  Serial.println(phValue, 2);
   
   return phValue;
 }
@@ -404,6 +411,10 @@ void setup() {
   server.on(F("/onOffVazao")  , handleToggleVazao);
   server.on(F("/calibrarNivel")  , handleCalibrarNivel);
   server.on(F("/calibrarVazao"), handleCalibraVazao);
+  server.on(F("/calibrarPH"), handleCalibraPH);
+  server.on(F("/phSetV4")  , handleSetPH4);
+  server.on(F("/phSetV7")  , handleSetPH7);
+  server.on(F("/resetarPH")  , handleResetPH);
   server.on(F("/atualizarMedicao")  , handleAtualizarMedicao);
   server.on(F("/medicaoMinimo")  , handleMedicaoMinimo);
   server.on(F("/medicaoMaximo")  , handleMedicaoMaximo);
