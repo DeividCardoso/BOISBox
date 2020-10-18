@@ -14,6 +14,7 @@
 #define trig 5  
 #define echo 4  
 #define oneWireBus 19
+#define sensorPH 35
 const int portaVazao = GPIO_NUM_21;
 
 // Constantes MQTT -----------------------------------
@@ -28,6 +29,7 @@ const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
 const byte        DNSSERVER_PORT          = 53;
 const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
 const int         LEITURAS_SENSOR         = 3;
+const float       m                       = -7.32;
 
 
 WiFiClient espClient;
@@ -61,6 +63,8 @@ float             mediaTemperatura[LEITURAS_SENSOR];
 double            vazao = 0;
 double            acumuladoVazao = 0;
 double            fatorConversao = 7.5;
+float             calibraPH = 0;
+unsigned long int avgValue;
 
 // Funções Genéricas ------------------------------------
 void log(String s) {
@@ -231,9 +235,9 @@ bool leSensores(){
     JsonObject temp = doc.createNestedObject("temperatura");
     temp["conectado"] = temperaturaOn;
     temp["valor"] = mediaLeitura(mediaTemperatura, LEITURAS_SENSOR, false);
-    JsonObject vazao = doc.createNestedObject("vazao");
-    vazao["conectado"] = vazaoOn;    
-    vazao["valor"] = acumuladoVazao;
+    JsonObject cons = doc.createNestedObject("consumo");
+    cons["conectado"] = vazaoOn;    
+    cons["valor"] = acumuladoVazao;
     JsonObject nivel = doc.createNestedObject("nivel");
     nivel["conectado"] = nivelOn;
     nivel["valor"] = mediaLeitura(mediaNivel, LEITURAS_SENSOR, false);
@@ -281,7 +285,49 @@ float mediaLeitura(float sensor[], int arraySize, bool contaZerados){
 }
 
 float leSensorPH(){
-  return (float) random(500, 700) / 100;
+  int buf[10],temp;
+  
+  for(int i=0;i<10;i++)       //Get 10 sample value from the sensor for smooth the value
+  { 
+    buf[i]=analogRead(sensorPH);
+    delay(10);
+  }
+  for(int i=0;i<9;i++)        //sort the analog from small to large
+  {
+    for(int j=i+1;j<10;j++)
+    {
+      if(buf[i]>buf[j])
+      {
+        temp=buf[i];
+        buf[i]=buf[j];
+        buf[j]=temp;
+      }
+    }
+  }
+  
+  avgValue=0;
+  for(int i=2;i<8;i++)                      //take the average value of 6 center sample
+    avgValue+=buf[i];    
+  
+  avgValue = avgValue/6;
+
+  Serial.print("Bits lidos no sensor 0 - min | 4095 - max: ");
+  Serial.println(avgValue);
+  
+  float voltage=((float)avgValue*3.3)/4095; //convert the analog into millivolt
+  Serial.print("Conversão de bits para tensão: ");
+  Serial.println(voltage);
+  
+  float phValue = 7 - (1.91 - voltage) * m;                      //convert the millivolt into pH value
+  Serial.print("Conversão para pH: ");  
+  Serial.println(phValue,2);
+
+  phValue = phValue + calibraPH;
+  
+  Serial.print("pH calibrado: ");
+  Serial.println(phValue, 2);
+  
+  return phValue;
 }
 
 float leSensorNivel(){
@@ -302,7 +348,7 @@ float leSensorTemperatura(){
 }
 
 // Setup -------------------------------------------
-void setup() {
+void setup() {  
   Serial.begin(115200);
   if (!SPIFFS.begin()) {
     log(F("SPIFFS ERRO"));
@@ -402,6 +448,8 @@ void setup() {
   if(!bkrOn){
     log("Notificações desabilitadas!");
   }
+
+  pinMode(sensorPH, INPUT);
   
   log(F("Pronto"));
 }
