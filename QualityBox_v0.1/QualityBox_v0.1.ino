@@ -15,12 +15,17 @@
 #define echo 4  
 #define oneWireBus 19
 #define sensorPH 35
+#define solenoide1 14
+#define solenoide2 27
+#define solenoide3 26
+#define solenoide4 25
+#define motor1 33
+#define motor2 32
 const int portaVazao = GPIO_NUM_21;
 
 // Constantes MQTT -----------------------------------
 const char* mqtt_server = "ec2-18-207-3-216.compute-1.amazonaws.com"; //mqtt server
 char publishTopic[] = "sensores";
-char subscribeTopic[] = "atuadores";
 
 
 // Contantes Server ----------------------------------
@@ -178,20 +183,82 @@ boolean configSave() {
 
 
 // MQTT --------------------------------------------
-void callbackMQTT(char* topic, byte* payload, unsigned int length) {   
+void callbackMQTT(char* topic, byte* payload, unsigned int length) {  
+  
   Serial.print("Nova mensagem do broker: [");
   Serial.print(topic);
   Serial.print("] ");
+  
   for (int i = 0; i < length; i++)
   {
     Serial.print((char)payload[i]);
   }  
   Serial.println();
+
+  String top = String(topic);
+  top = top.substring(top.lastIndexOf("/") +1);
+  char topicoReduzido[top.length() + 1];  
+  top.toCharArray(topicoReduzido, top.length() + 1);
+  
+  if (!strcmp(topicoReduzido, "solenoide1")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(solenoide1, LOW);
+            Serial.println("solenoide1 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(solenoide1, HIGH);
+            Serial.println("solenoide1 OFF");
+        }
+    }
+   else if (!strcmp(topicoReduzido, "solenoide2")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(solenoide2, LOW);
+            Serial.println("solenoide2 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(solenoide2, HIGH);
+            Serial.println("solenoide2 OFF");
+        }
+    }
+  else if (!strcmp(topicoReduzido, "solenoide3")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(solenoide3, LOW);
+            Serial.println("solenoide3 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(solenoide3, HIGH);
+            Serial.println("solenoide3 OFF");
+        }
+    }
+    else if (!strcmp(topicoReduzido, "solenoide4")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(solenoide4, LOW);
+            Serial.println("solenoide4 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(solenoide4, HIGH);
+            Serial.println("solenoide4 OFF");
+        }
+    }
+    else if (!strcmp(topicoReduzido, "motor1")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(motor1, HIGH);
+            Serial.println("motor1 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(motor1, LOW);
+            Serial.println("motor1 OFF");
+        }
+    }
+    else if (!strcmp(topicoReduzido, "motor2")) {
+        if (!strncmp((char *)payload, "On", length)) {
+            digitalWrite(motor2, HIGH);
+            Serial.println("motor2 ON");
+        } else if (!strncmp((char *)payload, "Off", length)) {
+            digitalWrite(motor2, LOW);
+            Serial.println("motor2 OFF");
+        }
+    }
 }
 
 void connectmqtt()
 {  
-  client.connect("Entrada");  // ESP will connect to mqtt broker with clientID - [Entrada/Saida]
+  client.connect(tipo);  // ESP will connect to mqtt broker with clientID - [Entrada/Saida]
   {
     if (!client.connected())
     {
@@ -200,11 +267,13 @@ void connectmqtt()
     else{
       log("Broker Conectado");
     }
+
+    String sT = "reservatorio/" + String(id) + "/atuadores/#";
+    char subscribeTopic[100];
+    sT.toCharArray(subscribeTopic, 100);
     
     client.subscribe("status", 1);
-    client.subscribe("solenoide", 1);
-    client.subscribe("bomba", 1);
-    client.subscribe("motor", 1);
+    client.subscribe(subscribeTopic, 1);
     client.publish("status", "Conectado");    
   }
 }
@@ -461,6 +530,19 @@ void setup() {
   }
 
   pinMode(sensorPH, INPUT);
+  pinMode(solenoide1, OUTPUT);
+  pinMode(solenoide2, OUTPUT);
+  pinMode(solenoide3, OUTPUT);
+  pinMode(solenoide4, OUTPUT);
+  pinMode(motor1, OUTPUT);
+  pinMode(motor2, OUTPUT);
+
+  digitalWrite(solenoide1, HIGH);
+  digitalWrite(solenoide2, HIGH);
+  digitalWrite(solenoide3, HIGH);
+  digitalWrite(solenoide4, HIGH);
+  digitalWrite(motor1, LOW);
+  digitalWrite(motor2, LOW);
   
   log(F("Pronto"));
 }
@@ -479,7 +561,7 @@ void loop() {
   if (!client.connected())
   {
     if(WiFi.status() == WL_CONNECTED){
-      reconnect();      
+      connectmqtt();      
     }
   } 
   else{
