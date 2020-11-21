@@ -15,26 +15,25 @@
 #define echo 4  
 #define oneWireBus 19
 #define sensorPH 35
-#define solenoide1 14
-#define solenoide2 27
-#define solenoide3 26
-#define solenoide4 25
-#define motor1 33
-#define motor2 32
+#define solenoide1 12
+#define solenoide2 14
+#define solenoide3 27
+#define solenoide4 26
+#define motor1 25
+#define motor2 33
 const int portaVazao = GPIO_NUM_21;
 
 // Constantes MQTT -----------------------------------
-const char* mqtt_server = "ec2-18-207-3-216.compute-1.amazonaws.com"; //mqtt server
+const char* mqtt_server = "ec2-54-159-186-28.compute-1.amazonaws.com"; //mqtt server
 char publishTopic[] = "sensores";
 
 
 // Contantes Server ----------------------------------
 const byte        WEBSERVER_PORT          = 80;
 const char*       WEBSERVER_HEADER_KEYS[] = {"User-Agent", "Cookie"};
-const byte        DNSSERVER_PORT          = 53;
-const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(13) + 340;
+const byte        DNSSERVER_PORT          = 53; 
+const   size_t    JSON_SIZE               = JSON_OBJECT_SIZE(19) + 420;
 const int         LEITURAS_SENSOR         = 3;
-//const float       m                       = -7.32;
 
 
 WiFiClient espClient;
@@ -66,13 +65,14 @@ float             mediaNivel[LEITURAS_SENSOR];
 float             mediaVazao[LEITURAS_SENSOR];
 float             mediaTemperatura[LEITURAS_SENSOR];
 double            vazao = 0;
-double            acumuladoVazao = 0;
-double            fatorConversao = 7.5;
+double            acumuladoVazao;
+double            fatorConversao;
+float             tanqueVazio, tanqueCheio;
 //pH
 unsigned long int avgValue;
 float             voltagePH = 0;
-float             vpH4 = 2.35;
-float             vpH7 = 1.97;
+float             vpH4;
+float             vpH7;
 
 
 
@@ -99,8 +99,8 @@ String hexStr(const unsigned long &h, const byte &l = 8) {
 
 // Funções de Configuração ------------------------------
 void  configReset() {
-  strlcpy(id, "1", sizeof(id)); 
-  strlcpy(tipo, "Entrada", sizeof(tipo)); 
+  strlcpy(id, "2", sizeof(id)); 
+  strlcpy(tipo, "Saida", sizeof(tipo)); 
   strlcpy(ssid, "", sizeof(ssid)); 
   strlcpy(pw, "", sizeof(pw)); 
   strlcpy(broker, mqtt_server, sizeof(broker));
@@ -138,6 +138,12 @@ boolean configRead() {
     nivelOn     = jsonConfig["nivel"]     | false;
     vazaoOn     = jsonConfig["vazao"]     | false;
     temperaturaOn     = jsonConfig["temperatura"]     | false;
+    tanqueVazio = jsonConfig["tnqvazio"]    | 100.00;
+    tanqueCheio = jsonConfig["tnqcheio"]    | 0.00;
+    fatorConversao = jsonConfig["fc-vazao"]    | 8;
+    acumuladoVazao = jsonConfig["ac-vazao"]    | 0.00;
+    vpH4 = jsonConfig["vph4"]    | 2.35;
+    vpH7 = jsonConfig["vph7"]    | 1.97;
 
     file.close();
 
@@ -168,6 +174,12 @@ boolean configSave() {
     jsonConfig["nivel"]       = nivelOn;
     jsonConfig["vazao"]       = vazaoOn;
     jsonConfig["temperatura"]       = temperaturaOn;
+    jsonConfig["tnqvazio"]       = tanqueVazio;
+    jsonConfig["tnqcheio"]       = tanqueCheio;
+    jsonConfig["fc-vazao"]       = fatorConversao;
+    jsonConfig["ac-vazao"]       = acumuladoVazao;
+    jsonConfig["vph4"]       = vpH4;
+    jsonConfig["vph7"]       = vpH7;
 
     serializeJsonPretty(jsonConfig, file);
     file.close();
@@ -478,6 +490,12 @@ void setup() {
   server.on(F("/onOffTemperatura")  , handleToggleTemperatura);
   server.on(F("/onOffPH")  , handleTogglePH);
   server.on(F("/onOffVazao")  , handleToggleVazao);
+  server.on(F("/onOffMotor1"), handleToggleMotor1);
+  server.on(F("/onOffMotor2"), handleToggleMotor2);
+  server.on(F("/onOffSolenoide1"), handleToggleSolenoide1);
+  server.on(F("/onOffSolenoide2"), handleToggleSolenoide2);
+  server.on(F("/onOffSolenoide3"), handleToggleSolenoide3);
+  server.on(F("/onOffSolenoide4"), handleToggleSolenoide4);
   server.on(F("/calibrarNivel")  , handleCalibrarNivel);
   server.on(F("/calibrarVazao"), handleCalibraVazao);
   server.on(F("/calibrarPH"), handleCalibraPH);

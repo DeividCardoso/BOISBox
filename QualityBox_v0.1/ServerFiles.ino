@@ -547,6 +547,7 @@ void handleCalibraPH(){
 void handleSetPH4(){
 //  setNivelMaximo();
   vpH4 = voltagePH;
+  configSave();
   server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
   server.send(302, "text/plane","");
 }
@@ -554,6 +555,7 @@ void handleSetPH4(){
 void handleSetPH7(){
 //  setNivelMaximo();
   vpH7 = voltagePH;
+  configSave();
   server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
   server.send(302, "text/plane","");
 }
@@ -561,6 +563,7 @@ void handleSetPH7(){
 void handleResetPH(){
   vpH4 = 2.35;
   vpH7 = 1.97;
+  configSave();
   server.sendHeader("Location", "/calibrarPH",true); //Redirect to our html web page 
   server.send(302, "text/plane","");
 }
@@ -573,24 +576,28 @@ void handleAtualizarMedicao(){
 
 void handleMedicaoMinimo(){
   setNivelMinimo();
+  configSave();
   server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 
 }
 
 void handleMedicaoMaximo(){
   setNivelMaximo();
+  configSave();
   server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 
 }
 
 void handleResetNivel(){
   resetaSensorNivel();
+  configSave();
   server.sendHeader("Location", "/calibrarNivel",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 
 }
 
 void handleZeraConsumo(){
   acumuladoVazao = 0;
+  configSave();
   server.sendHeader("Location", "/calibrarVazao",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 
 }
@@ -610,6 +617,55 @@ void handleAtuadores() {
       s.replace(F("<navMenu></navMenu>"), snavMenu);
       s.replace(F("#atuadoresActive#"), "active");
     }  
+
+    if(digitalRead(motor1)){    
+       s.replace(F("#btn-motor1-cor#"), "btn-danger");
+       s.replace(F("#text-motor1#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-motor1-cor#"), "btn-success");
+       s.replace(F("#text-motor1#"), "ON");
+    }
+    if(digitalRead(motor2)){    
+       s.replace(F("#btn-motor2-cor#"), "btn-danger");
+       s.replace(F("#text-motor2#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-motor2-cor#"), "btn-success");
+       s.replace(F("#text-motor2#"), "ON");
+    }
+    if(!digitalRead(solenoide1)){    
+       s.replace(F("#btn-solenoide1-cor#"), "btn-danger");
+       s.replace(F("#text-solenoide1#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-solenoide1-cor#"), "btn-success");
+       s.replace(F("#text-solenoide1#"), "ON");
+    }
+    if(!digitalRead(solenoide2)){    
+       s.replace(F("#btn-solenoide2-cor#"), "btn-danger");
+       s.replace(F("#text-solenoide2#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-solenoide2-cor#"), "btn-success");
+       s.replace(F("#text-solenoide2#"), "ON");
+    }
+    if(!digitalRead(solenoide3)){    
+       s.replace(F("#btn-solenoide3-cor#"), "btn-danger");
+       s.replace(F("#text-solenoide3#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-solenoide3-cor#"), "btn-success");
+       s.replace(F("#text-solenoide3#"), "ON");
+    }
+    if(!digitalRead(solenoide4)){    
+       s.replace(F("#btn-solenoide4-cor#"), "btn-danger");
+       s.replace(F("#text-solenoide4#"), "OFF");
+    }
+    else {
+       s.replace(F("#btn-solenoide4-cor#"), "btn-success");
+       s.replace(F("#text-solenoide4#"), "ON");
+    }
 
     server.send(200, F("text/html"), s);
     log("Atuadores - Cliente: " + ipStr(server.client().remoteIP()) +
@@ -657,6 +713,42 @@ void handleTogglePH(){
 void handleToggleVazao(){
   vazaoOn = !vazaoOn;
   server.sendHeader("Location", "/sensores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleMotor1(){
+  digitalWrite(motor1, !digitalRead(motor1));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleMotor2(){
+  digitalWrite(motor2, !digitalRead(motor2));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleSolenoide1(){
+  digitalWrite(solenoide1, !digitalRead(solenoide1));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleSolenoide2(){
+  digitalWrite(solenoide2, !digitalRead(solenoide2));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleSolenoide3(){
+  digitalWrite(solenoide3, !digitalRead(solenoide3));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
+  server.send(302, "text/plane",""); 
+}
+
+void handleToggleSolenoide4(){
+  digitalWrite(solenoide4, !digitalRead(solenoide4));
+  server.sendHeader("Location", "/atuadores",true); //Redirect to our html web page 
   server.send(302, "text/plane",""); 
 }
 

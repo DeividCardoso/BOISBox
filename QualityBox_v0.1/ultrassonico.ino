@@ -1,4 +1,4 @@
-float tanqueVazio = 100, tanqueCheio = 0;
+//float tanqueVazio = 100, tanqueCheio = 0;
 int opcao = 0;
 
 bool setNivelMinimo(){

@@ -1,72 +1,82 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Quality Box</title>
-  </head>
-  <body>    
-    <navMenu></navMenu>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="bootstrap">
 
-      <div class="container">       
-        <div class="row">          
-          <div class="col-sm mb-5">                  
-              <p class="font-weight-normal h5">Atuadores</p>  
-              <hr>  
-              
-              <table class="table table-striped table-responsive-md">
-                <thead></thead>                
-                <tbody>
-                  <tr>
-                    <th scope="row">Bomba</th>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
-                    </td>                    
-                    <td><button type="button" class="btn btn-sm btn-danger btn-block m-0">Desconectar</button></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Clorador</th>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
-                    </td>                    
-                    <td><button type="button" class="btn btn-sm btn-danger btn-block m-0">Desconectar</button></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Solenoide 1</th>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
-                    </td>                    
-                    <td><button type="button" class="btn btn-sm btn-success btn-block m-0">Conectar</button></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Solenoide 2</th>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-primary btn-block m-0">Testar</button>
-                    </td>                    
-                    <td><button type="button" class="btn btn-sm btn-success btn-block m-0">Conectar</button></td>
-                  </tr>
-                </tbody>                
-              </table>
+  <title>Quality Box</title>
+</head>
 
-          </div>
+<body>
+  <navMenu></navMenu>
 
-          <div class="col-sm mb-5">
-              <p class="font-weight-normal h5">Teste</p>
-              <hr>
-              
-          </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm mb-12">
+        <p class="font-weight-normal h5">Atuadores</p>
+        <hr>
 
-        </div>
+        <table class="table table-striped table-responsive-md">
+          <thead></thead>
+          <tbody>
+            <tr>
+              <th scope="row">Motor 1</th>
+              <td>
+                <a href="onOffMotor1" class="btn btn-sm #btn-motor1-cor# m-0">#text-motor1#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-motor1-cor# m-0">#text-motor1#</button> -->
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Motor 2</th>
+              <td>
+                <a href="onOffMotor2" class="btn btn-sm #btn-motor2-cor# m-0">#text-motor2#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-motor2-cor# m-0">#text-motor2#</button> -->
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Solenoide 1</th>
+              <td>
+                <a href="onOffSolenoide1" class="btn btn-sm #btn-solenoide1-cor# m-0">#text-solenoide1#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-solenoide1-cor# m-0">#text-solenoide1#</button> -->
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Solenoide 2</th>
+              <td>
+                <a href="onOffSolenoide2" class="btn btn-sm #btn-solenoide2-cor# m-0">#text-solenoide2#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-solenoide2-cor# m-0">#text-solenoide2#</button> -->
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Solenoide 3</th>
+              <td>
+                <a href="onOffSolenoide3" class="btn btn-sm #btn-solenoide3-cor# m-0">#text-solenoide3#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-solenoide3-cor# m-0">#text-solenoide3#</button> -->
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Solenoide 4</th>
+              <td>
+                <a href="onOffSolenoide4" class="btn btn-sm #btn-solenoide4-cor# m-0">#text-solenoide4#</a>
+                <!-- <button type="button" class="btn btn-sm #btn-solenoide4-cor# m-0">#text-solenoide4#</button> -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
       </div>
+    </div>
+  </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="jquery"></script>
-    <script src="bootstrap-js"></script>
-  </body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="jquery"></script>
+  <script src="bootstrap-js"></script>
+</body>
+
 </html>
